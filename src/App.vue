@@ -1,32 +1,27 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div class="text">
+      123
+      <van-button type="primary">主要按鈕</van-button>
+      <div class="box"></div>
+      <p>12345</p>
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
+<script>
+export default {}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.text {
+  font-size: 30px;
+  padding: 20px;
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.box {
+  width: 100%;
+  height: 100px;
+  background-color: pink;
 }
 </style>
