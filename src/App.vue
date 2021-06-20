@@ -1,11 +1,5 @@
 <template>
   <div id="app">
-    <div class="text">
-      123
-      <van-button type="primary">主要按鈕</van-button>
-      <div class="box"></div>
-      <p>12345</p>
-    </div>
     <router-view />
   </div>
 </template>

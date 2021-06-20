@@ -7,7 +7,11 @@ import 'amfe-flexible'
 // import vant
 import Vant from 'vant'
 import 'vant/lib/index.css'
-
+import VueAxios from 'vue-axios'
+import axios from 'axios'
+axios.defaults.baseURL = '/api'
+axios.defaults.timeout = 10000
+Vue.use(VueAxios, axios)
 Vue.use(Vant)
 Vue.config.productionTip = false
 
