@@ -70,7 +70,10 @@
           :icon="item.img"
           :text="item.name"
           :to="{ path: '/category', query: { label: item.name } }"
-        />
+        >
+        <van-image :src="item.img" rel="external nofollow" class="grid-img"  />
+        <p>{{item.name}}</p>
+        </van-grid-item>
       </van-grid>
     </div>
     <div class="nav-sub-title">
@@ -271,6 +274,15 @@ export default {
   padding-top: 0;
   margin-bottom: 60px;
   text-align: center;
+  .grid-img{
+    width: 60px;
+    height: 60px;
+  }
+  p{
+    font-size: 14px;
+    margin-top: 15px;
+    color: #646566;
+  }
 }
 .loadingImg {
   width: 100px;
