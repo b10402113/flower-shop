@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/'
 
   // devServer: {
   //   port: 2021, // 设置端口号
@@ -10,5 +10,4 @@ module.exports = {
   //   open: false, // 配置自动启动浏览器
   //   proxy: null // 设置代理
   // }
-  productionSourceMap: false
 }
