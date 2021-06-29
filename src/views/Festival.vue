@@ -1,29 +1,35 @@
 <template>
   <div>
     <van-nav-bar
-      title="節日名稱"
+      :title="festival_name"
       left-text="返回"
       left-arrow
       @click-left="onClickLeft"
-      @click-right="onClickRight"
     />
     <div class="banner">
-      <img src="../assets/images/valentines.jpeg" alt="" />
+      <img :src="img" alt="" />
     </div>
     <sub-title title="節日意義"></sub-title>
     <div class="festival-meaning">
       <p>
-        雖然只要有心，每天都是情人節，但倘若每個月都會在行事曆上看到這節日，那還真是叫單身的人不知如何是好。除了先前我們介紹過的「黑色情人節」外，事實上還有各式各樣令人大開眼界的隱藏版情人節，而且是韓國從國定情人節延伸出來的，就算每個月迎接度過類似的節日也樂此不彼。到底分別有哪些充滿愛的意涵？以下帶你一探究竟，如果想跟另一半一起耍浪漫的話不妨筆記起來吧！
+        {{ meaning }}
       </p>
     </div>
     <sub-title title="推薦花種"></sub-title>
     <div class="flower-grid">
-      <van-grid :column-num="3">
+      <img
+        v-if="isLoading"
+        src="../assets/images/loading.gif"
+        alt=""
+        class="loadingImg"
+      />
+      <van-grid :column-num="3" clickable v-else>
         <van-grid-item
-          v-for="value in 6"
-          :key="value"
-          icon="photo-o"
-          text="文字"
+          v-for="item in flower_species"
+          :key="item.name"
+          :icon="item.img"
+          :text="item.name"
+          :to="{ path: '/category', query: { label: item.name}}"
         />
       </van-grid>
     </div>
@@ -34,12 +40,51 @@
 import SubTitle from '../components/SubTitle.vue'
 export default {
   components: { SubTitle },
-
+  data () {
+    return {
+      flower_species: [],
+      isLoading: true,
+      festival_name: '',
+      meaning: '',
+      img: ''
+    }
+  },
   name: 'Festival',
   methods: {
     onClickLeft () {
       this.$router.push('/')
     }
+  },
+  mounted () {
+    console.log(this.$route.params.name)
+    this.festival_name = this.$route.params.name
+    var bodyFormData = new FormData()
+    bodyFormData.append('festival', this.$route.params.name)
+    this.axios.post('/festival2flower', bodyFormData).then(res => {
+      console.log(res.data)
+      this.img = res.data[0].img
+      this.meaning = res.data[0].meaning
+      const promises = []
+      for (var i = 0; i < res.data.length; i++) {
+        promises.push(this.axios.get(`/getImage?label=${res.data[i].name}`))
+      }
+
+      Promise.all(promises).then(responses => {
+        const finalObj = []
+        responses.forEach((item, index) => {
+          var obj = {}
+          obj.name = res.data[index].name
+          if (item.data.length !== 0) {
+            obj.img = item.data[0].image
+          } else {
+            obj.img = require('../assets/images/default.jpeg')
+          }
+          finalObj.push(obj)
+        })
+        this.flower_species = finalObj
+        this.isLoading = false
+      })
+    })
   }
 }
 </script>
@@ -75,5 +120,8 @@ export default {
     color: #202020;
     opacity: 0.7;
   }
+}
+.flower-grid {
+  text-align: center;
 }
 </style>

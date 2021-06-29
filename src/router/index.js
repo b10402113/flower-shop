@@ -11,6 +11,11 @@ const routes = [
     component: Home
   },
   {
+    path: '/category',
+    name: 'Category',
+    component: () => import('../views/Category.vue')
+  },
+  {
     path: '/detail',
     name: 'Detail',
     // route level code-splitting
@@ -19,7 +24,7 @@ const routes = [
     component: () => import('../views/Detail.vue')
   },
   {
-    path: '/festival',
+    path: '/festival/:name',
     name: 'Festival',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route

@@ -1,21 +1,20 @@
 <template>
   <div class="home">
-    <div class="search-field">
+    <!-- <div class="search-field">
       <van-search
         v-model="value"
         placeholder="請輸入搜索花卉"
         background="#ff5a5f"
       />
-    </div>
+    </div> -->
     <div class="nav-title">
       <p>花卉市場</p>
     </div>
     <div class="swiper">
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-        <van-swipe-item>1</van-swipe-item>
-        <van-swipe-item>2</van-swipe-item>
-        <van-swipe-item>3</van-swipe-item>
-        <van-swipe-item>4</van-swipe-item>
+        <van-swipe-item class="van-swiper">
+          <img src="../assets/images/banner.png" alt="" />
+        </van-swipe-item>
       </van-swipe>
     </div>
     <div class="nav-sub-title">
@@ -31,13 +30,24 @@
         class="loadingImg"
       />
       <div class="box-wrapper" v-else>
-        <router-link to="/festival">
-          <div class="box"></div>
+        <router-link
+          :to="{ name: 'Festival', params: { name: festival } }"
+          v-for="(festival, index) in hottestFestival"
+          :key="index"
+        >
+          <div class="box">
+            <p>{{ festival }}</p>
+          </div>
         </router-link>
+        <!-- <router-link to="/festival">
+          <div class="box">
+            <p>123</p>
+          </div>
+        </router-link> -->
+        <!-- <div class="box"></div>
         <div class="box"></div>
         <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+        <div class="box"></div> -->
       </div>
     </div>
     <div class="nav-sub-title">
@@ -53,21 +63,31 @@
         class="loadingImg"
       />
 
-      <van-grid :column-num="3" v-else>
+      <van-grid :column-num="3" clickable v-else>
         <van-grid-item
           v-for="(item, index) in hottestFlower"
           :key="index"
-          icon="photo-o"
-          :text="item"
+          :icon="item.img"
+          :text="item.name"
+          :to="{ path: '/category', query: { label: item.name } }"
         />
       </van-grid>
     </div>
-
-    <van-tabbar>
+    <div class="nav-sub-title">
+      <p>
+        <span>附近店家</span>
+      </p>
+    </div>
+    <div class="stores-around">
+      <van-button type="primary" block color="#ddeaf8" @click="findStore"
+        >點我查找</van-button
+      >
+    </div>
+    <!-- <van-tabbar>
       <van-tabbar-item icon="home-o">首頁</van-tabbar-item>
       <van-tabbar-item icon="search">搜尋</van-tabbar-item>
       <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
-    </van-tabbar>
+    </van-tabbar> -->
   </div>
 </template>
 
@@ -82,25 +102,76 @@ export default {
       value: '',
       hottestFlower: [],
       isLoading: true,
-      festivalLoading: true
+      festivalLoading: true,
+      hottestFestival: [],
+      newArray: []
     }
   },
   mounted () {
-    console.log('123')
     this.axios.get('/hottestFlower').then(res => {
       const result = res.data.split(' ')
       result.pop()
-      this.hottestFlower = result
-      this.isLoading = false
+      const promises = []
+      for (var i = 0; i < result.length; i++) {
+        promises.push(this.axios.get(`/getImage?label=${result[i]}`))
+      }
+
+      Promise.all(promises).then(responses => {
+        const finalObj = []
+        responses.forEach((item, index) => {
+          var obj = {}
+          obj.name = result[index]
+          if (item.data.length !== 0) {
+            obj.img = item.data[0].image
+          } else {
+            obj.img = require('../assets/images/default.jpeg')
+          }
+          finalObj.push(obj)
+        })
+
+        this.hottestFlower = finalObj
+        this.isLoading = false
+      })
     })
     this.axios.get('/upcomingfestival').then(res => {
-      const result = res.data
-      console.log(result)
+      const festivalArr = res.data
+      for (var i = 0; i < festivalArr.length; i++) {
+        this.hottestFestival.push(festivalArr[i].name)
+      }
+      this.festivalLoading = false
+      // console.log(result)
     })
+  },
+  //   https://www.youtube.com/watch?v=ID-_D0zJlSM&ab_channel=SoftAuthor
+  // <a href="http://maps.google.com/maps?saddr=New+York&daddr=San+Francisco"
+  //   >Route New York --> San Francisco</a
+  // >
+  methods: {
+    findStore () {
+      // if (navigator.geolocation) {
+      //   navigator.geolocation.getCurrentPosition(
+      //     position => {
+      //       console.log(position.coords.latitude, position.coords.longitude)
+      //     },
+      //     error => {
+      //       console.log(error)
+      //     }
+      //   )
+      // }
+      // console.log(1)
+      window.location.href =
+        'https://www.google.com.tw/maps/search/%E8%8A%B1%E5%BA%97'
+    }
   }
 }
 </script>
 <style lang="scss" scoped>
+.van-swiper {
+  img {
+    height: 150px;
+    width: 100%;
+  }
+}
 .search-field {
   background-color: red;
 }
@@ -131,9 +202,9 @@ export default {
 .swiper .van-swipe-item {
   color: #fff;
   font-size: 20px;
-  line-height: 150px;
+  // line-height: 150px;
   text-align: center;
-  background-color: #ffe4b8;
+  // background-color: #ffe4b8;
 }
 .nav-sub-title {
   p {
@@ -180,10 +251,19 @@ export default {
     width: 30%;
     margin-left: 3%;
     height: 150px;
-    background: #ffe4b8;
+    background: #fbe9ed;
     border-radius: 3px;
     box-shadow: rgba(0, 0, 0, 0.1) 2px 2px 3px;
     display: inline-block; /*行内块元素*/
+    position: relative;
+    p {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #f7c6d1;
+      writing-mode: vertical-rl;
+    }
   }
 }
 .flower-grid {
@@ -196,7 +276,13 @@ export default {
   width: 100px;
   height: 100px;
 }
-.scroll-box{
+.scroll-box {
   text-align: center;
+}
+.stores-around {
+  padding: 20px;
+  .van-button__text {
+    color: #5d6065;
+  }
 }
 </style>
